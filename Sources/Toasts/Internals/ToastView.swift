@@ -8,12 +8,8 @@ internal struct ToastView: View {
 
   var body: some View {
     main
-      ._background {
-        Capsule().fill(Color.toastBackground)
-      }
       .frame(height: 48)
-      .compositingGroup()
-      .shadow(color: .primary.opacity(isDark ? 0.0 : 0.1), radius: 16, y: 8.0)
+      .modifier(ToastBackgroundModifier(isDark: isDark))
   }
 
   private var main: some View {
@@ -62,6 +58,26 @@ internal struct ToastView: View {
       .fixedSize(horizontal: true, vertical: false)
     }
     .buttonStyle(.plain)
+  }
+}
+
+// MARK: - Conditional Background Modifier
+
+private struct ToastBackgroundModifier: ViewModifier {
+  let isDark: Bool
+
+  func body(content: Content) -> some View {
+    if #available(iOS 26, *) {
+      content
+        .glassEffect(.regular, in: Capsule())
+    } else {
+      content
+        ._background {
+          Capsule().fill(Color.toastBackground)
+        }
+        .compositingGroup()
+        .shadow(color: .primary.opacity(isDark ? 0.0 : 0.1), radius: 16, y: 8.0)
+    }
   }
 }
 
